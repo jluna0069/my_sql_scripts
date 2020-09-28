@@ -1,0 +1,1 @@
+SELECT physical_memory_in_bytes/1048576.0 as MEMORIA_MB FROM sys.dm_os_sys_info

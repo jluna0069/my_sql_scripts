@@ -1,0 +1,1 @@
+SELECT cntr_value/1024.0 MEMORIA_EN_USO_MB FROM sys.dm_os_performance_counters WHERE counter_name = 'Total Server Memory (KB)'

@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML xmlns="http://www.w3.org/TR/REC-html40" xmlns:o = 
+"urn:schemas-microsoft-com:office:office" xmlns:w = 
+"urn:schemas-microsoft-com:office:word" xmlns:x = 
+"urn:schemas-microsoft-com:office:excel"><HEAD>
+<META content="text/html; charset=iso-8859-1" http-equiv=Content-Type>
+<META name=GENERATOR content="MSHTML 8.00.6001.19190">
+<STYLE>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EstiloCorreo17
+	{mso-style-type:personal-compose;
+	font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:70.85pt 3.0cm 70.85pt 3.0cm;}
+div.Section1
+	{page:Section1;}
+-->
+</STYLE>
+</HEAD>
+<BODY lang=ES link=blue vLink=purple><B>De:</B> Andres Dario Adam<BR><B>Enviado 
+el:</B> Viernes, 18 de Noviembre de 2011 11:20 a.m.<BR><B>Para:</B> Gonzalo 
+Rafael Bonilla; Andres Dario Adam<BR><B>Asunto:</B> SQL Server: Mover BD 
+Tempdb<BR>
+<DIV class=Section1>
+<P class=MsoNormal><FONT color=blue size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; COLOR: blue; FONT-SIZE: 10pt" 
+lang=EN-US>USE</SPAN></FONT><FONT size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; FONT-SIZE: 10pt" lang=EN-US> <FONT 
+color=blue><SPAN style="COLOR: blue">master</SPAN></FONT><FONT color=gray><SPAN 
+style="COLOR: gray">;<o:p></o:p></SPAN></FONT></SPAN></FONT></P>
+<P class=MsoNormal><FONT color=blue size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; COLOR: blue; FONT-SIZE: 10pt" 
+lang=EN-US>GO<o:p></o:p></SPAN></FONT></P>
+<P class=MsoNormal><FONT color=blue size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; COLOR: blue; FONT-SIZE: 10pt" 
+lang=EN-US>ALTER</SPAN></FONT><FONT size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; FONT-SIZE: 10pt" lang=EN-US> <FONT 
+color=blue><SPAN style="COLOR: blue">DATABASE</SPAN></FONT> tempdb 
+<o:p></o:p></SPAN></FONT></P>
+<P class=MsoNormal><FONT color=blue size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; COLOR: blue; FONT-SIZE: 10pt" 
+lang=EN-US>MODIFY</SPAN></FONT><FONT size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; FONT-SIZE: 10pt" lang=EN-US> <FONT 
+color=blue><SPAN style="COLOR: blue">FILE </SPAN></FONT><FONT color=gray><SPAN 
+style="COLOR: gray">(</SPAN></FONT>NAME <FONT color=gray><SPAN 
+style="COLOR: gray">=</SPAN></FONT> tempdev<FONT color=gray><SPAN 
+style="COLOR: gray">,</SPAN></FONT> <FONT color=blue><SPAN 
+style="COLOR: blue">FILENAME</SPAN></FONT> <FONT color=gray><SPAN 
+style="COLOR: gray">=</SPAN></FONT> <FONT color=red><SPAN 
+style="COLOR: red">'E:\SQLData\tempdb.mdf'</SPAN></FONT><FONT color=gray><SPAN 
+style="COLOR: gray">);<o:p></o:p></SPAN></FONT></SPAN></FONT></P>
+<P class=MsoNormal><FONT color=blue size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; COLOR: blue; FONT-SIZE: 10pt" 
+lang=EN-US>GO<o:p></o:p></SPAN></FONT></P>
+<P class=MsoNormal><FONT color=blue size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; COLOR: blue; FONT-SIZE: 10pt" 
+lang=EN-US>ALTER</SPAN></FONT><FONT size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; FONT-SIZE: 10pt" lang=EN-US> <FONT 
+color=blue><SPAN style="COLOR: blue">DATABASE</SPAN></FONT> tempdb 
+<o:p></o:p></SPAN></FONT></P>
+<P class=MsoNormal><FONT color=blue size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; COLOR: blue; FONT-SIZE: 10pt" 
+lang=EN-US>MODIFY</SPAN></FONT><FONT size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; FONT-SIZE: 10pt" lang=EN-US> <FONT 
+color=blue><SPAN style="COLOR: blue">FILE </SPAN></FONT><FONT color=gray><SPAN 
+style="COLOR: gray">(</SPAN></FONT>NAME <FONT color=gray><SPAN 
+style="COLOR: gray">=</SPAN></FONT> templog<FONT color=gray><SPAN 
+style="COLOR: gray">,</SPAN></FONT> <FONT color=blue><SPAN 
+style="COLOR: blue">FILENAME</SPAN></FONT> <FONT color=gray><SPAN 
+style="COLOR: gray">=</SPAN></FONT> <FONT color=red><SPAN 
+style="COLOR: red">'E:\SQLData\templog.ldf'</SPAN></FONT><FONT color=gray><SPAN 
+style="COLOR: gray">);<o:p></o:p></SPAN></FONT></SPAN></FONT></P>
+<P class=MsoNormal><FONT color=blue size=2 face="Courier New"><SPAN 
+style="FONT-FAMILY: 'Courier New'; COLOR: blue; FONT-SIZE: 10pt">GO</SPAN></FONT><FONT 
+size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt"><o:p></o:p></SPAN></FONT></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt">Andrés D. 
+Adam</SPAN></FONT><o:p></o:p></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt">Administrador de Bases de 
+Datos</SPAN></FONT><o:p></o:p></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt" lang=EN>Dpto. Tecnología 
+</SPAN></FONT><o:p></o:p></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt" lang=EN>Tel: 
+4370-3989</SPAN></FONT><o:p></o:p></P>
+<P class=MsoNormal><FONT size=3 face="Times New Roman"><SPAN 
+style="FONT-SIZE: 12pt"><o:p>&nbsp;</o:p></SPAN></FONT></P></DIV></BODY></HTML>

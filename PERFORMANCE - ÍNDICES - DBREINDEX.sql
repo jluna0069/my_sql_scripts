@@ -1,0 +1,4 @@
+﻿DBCC DBREINDEX ([tabla],'',0)
+Go
+PRINT GETDATE()
+Go

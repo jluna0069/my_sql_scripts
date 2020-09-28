@@ -1,0 +1,45 @@
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\P$\Backup_full\ f\Backup_full\ sip1.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\U$\Backup_full\ f:\Backup_full\ sip2.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\V$\Backup_full\ f:\Backup_full\ sip3.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\W$\Backup_full\ f:\Backup_full\ sip4.bak /Z
+
+
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\P$\Backup_full\ f:\Backup_full\ compras1.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\U$\Backup_full\ f:\Backup_full\ compras2.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\V$\Backup_full\ f:\Backup_full\ compras3.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\W$\Backup_full\ f:\Backup_full\ compras4.bak /Z
+
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\P$\Backup_full\ f:\Backup_full\ FACTURACION1.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\U$\Backup_full\ f:\Backup_full\ FACTURACION2.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\V$\Backup_full\ f:\Backup_full\ FACTURACION3.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\W$\Backup_full\ f:\Backup_full\ FACTURACION4.bak /Z
+
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\P$\Backup_full\ f:\Backup_full\ INGRESOS1.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\U$\Backup_full\ f:\Backup_full\ INGRESOS2.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\V$\Backup_full\ f:\Backup_full\ INGRESOS3.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\W$\Backup_full\ f:\Backup_full\ INGRESOS4.bak /Z
+
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\P$\Backup_full\ f:\Backup_full\ RECEPCIONES1.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\U$\Backup_full\ f:\Backup_full\ RECEPCIONES2.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\V$\Backup_full\ f:\Backup_full\ RECEPCIONES3.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\W$\Backup_full\ f:\Backup_full\ RECEPCIONES4.bak /Z
+
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\P$\Backup_full\ f:\Backup_full\ SGL1.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\U$\Backup_full\ f:\Backup_full\ SGL2.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\V$\Backup_full\ f:\Backup_full\ SGL3.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\W$\Backup_full\ f:\Backup_full\ SGL4.bak /Z
+
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\P$\Backup_full\ f:\Backup_full\ SIPDWH1.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\U$\Backup_full\ f:\Backup_full\ SIPDWH2.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\V$\Backup_full\ f:\Backup_full\ SIPDWH3.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\W$\Backup_full\ f:\Backup_full\ SIPDWH4.bak /Z
+
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\P$\Backup_full\ f:\Backup_full\ TRANSFERENCIAS1.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\U$\Backup_full\ f:\Backup_full\ TRANSFERENCIAS2.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\V$\Backup_full\ f:\Backup_full\ TRANSFERENCIAS3.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\W$\Backup_full\ f:\Backup_full\ TRANSFERENCIAS4.bak /Z
+
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\P$\Backup_full\ f:\Backup_full\ TRANSFORMACION1.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\U$\Backup_full\ f:\Backup_full\ TRANSFORMACION2.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\V$\Backup_full\ f:\Backup_full\ TRANSFORMACION3.bak /Z
+\\D095SRTEC55\c$\Utils\robocopy \\D095NWSQPROD09\W$\Backup_full\ f:\Backup_full\ TRANSFORMACION4.bak /Z

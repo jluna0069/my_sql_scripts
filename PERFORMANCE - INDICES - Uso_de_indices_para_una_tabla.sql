@@ -1,0 +1,19 @@
+USE dw
+go
+SELECT   OBJECT_NAME(S.[OBJECT_ID]) AS [OBJECT NAME],
+          I.[NAME] AS [INDEX NAME],
+          USER_SEEKS,
+          USER_SCANS,
+          USER_LOOKUPS,
+          USER_UPDATES
+FROM     SYS.DM_DB_INDEX_USAGE_STATS AS S
+          INNER JOIN SYS.INDEXES AS I
+            ON I.[OBJECT_ID] = S.[OBJECT_ID]
+               AND I.INDEX_ID = S.INDEX_ID
+WHERE OBJECT_NAME(S.[OBJECT_ID]) = 'AS4_DATAWRKHF_HIST'
+ORDER BY USER_SCANS desc
+go
+--exec sp_	spaceused 'PRT_Siniestro'
+--go
+--DBCC SHOWCONTIG ('PRT_Siniestros')
+--go

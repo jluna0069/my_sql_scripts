@@ -1,0 +1,4 @@
+\\D095SRTEC55\c$\Utils\robocopy P:\Backup_full\ \\D095NWSQPROD09\P$\Backup_full\ /Z
+\\D095SRTEC55\c$\Utils\robocopy U:\Backup_full\ \\D095NWSQPROD09\U$\Backup_full\ /Z
+\\D095SRTEC55\c$\Utils\robocopy V:\Backup_full\ \\D095NWSQPROD09\V$\Backup_full\ /Z
+\\D095SRTEC55\c$\Utils\robocopy W:\Backup_full\ \\D095NWSQPROD09\W$\Backup_full\ /Z

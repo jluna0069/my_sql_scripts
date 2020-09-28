@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML xmlns="http://www.w3.org/TR/REC-html40" xmlns:o = 
+"urn:schemas-microsoft-com:office:office" xmlns:w = 
+"urn:schemas-microsoft-com:office:word"><HEAD>
+<META content="text/html; charset=iso-8859-1" http-equiv=Content-Type>
+<META name=GENERATOR content="MSHTML 8.00.6001.19190">
+<STYLE>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Consolas;
+	panose-1:2 11 6 9 2 2 4 3 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EstiloCorreo17
+	{mso-style-type:personal-compose;
+	font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:595.3pt 841.9pt;
+	margin:70.85pt 3.0cm 70.85pt 3.0cm;}
+div.Section1
+	{page:Section1;}
+-->
+</STYLE>
+</HEAD>
+<BODY lang=ES link=blue vLink=purple><B>De:</B> Andres Dario Adam<BR><B>Enviado 
+el:</B> Viernes, 05 de Agosto de 2011 12:06 p.m.<BR><B>Para:</B> Andres Dario 
+Adam<BR><B>Asunto:</B> Cómo configurar Advanced Options y xp_cmdshell<BR>
+<DIV class=Section1>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>-- To allow advanced options to be 
+changed.<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>EXEC sp_configure 'show advanced options', 
+1<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>GO<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>-- To update the currently configured value for advanced 
+options.<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>RECONFIGURE<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>GO<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>-- To enable the feature.<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>EXEC sp_configure 'xp_cmdshell', 1<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>GO<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt" 
+lang=EN-US>-- To update the currently configured value for this 
+feature.<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN 
+style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt">RECONFIGURE<o:p></o:p></SPAN></FONT></P>
+<P style="WORD-BREAK: break-all" class=MsoNormal><FONT color=black size=2 
+face=Consolas><SPAN 
+style="FONT-FAMILY: Consolas; COLOR: black; FONT-SIZE: 10pt">GO<o:p></o:p></SPAN></FONT></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt"><o:p>&nbsp;</o:p></SPAN></FONT></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt" lang=EN-US>Andrés D. 
+Adam</SPAN></FONT><SPAN lang=EN-US><o:p></o:p></SPAN></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt" lang=EN-US>DBA MS SQL 
+Server</SPAN></FONT><SPAN lang=EN-US><o:p></o:p></SPAN></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt" lang=EN>Dpto. Tecnología 
+</SPAN></FONT><o:p></o:p></P>
+<P class=MsoNormal><FONT size=2 face=Arial><SPAN 
+style="FONT-FAMILY: Arial; FONT-SIZE: 10pt" lang=EN>Tel: 
+4370-3989</SPAN></FONT><o:p></o:p></P>
+<P class=MsoNormal><FONT size=3 face="Times New Roman"><SPAN 
+style="FONT-SIZE: 12pt"><o:p>&nbsp;</o:p></SPAN></FONT></P></DIV></BODY></HTML>

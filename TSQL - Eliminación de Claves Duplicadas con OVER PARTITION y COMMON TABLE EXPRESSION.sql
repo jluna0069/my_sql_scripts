@@ -1,0 +1,25 @@
+--USE PISCYS
+--GO
+
+--ELIMINAMOS REGISTROS DUPLICADOS
+WITH cte AS (
+  SELECT chrCUIL,intIdTelefono,
+     row_number() OVER (PARTITION BY chrCUIL,intIdTelefono ORDER BY chrCUIL,intIdTelefono) AS rn
+  FROM PRT_TelefonosTrabajador  
+)
+DELETE cte WHERE rn > 1
+
+--VOLVEMOS A CREAR LA PK EN PRODUCCION
+IF NOT EXISTS (SELECT table_name FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE  CONSTRAINT_TYPE = 'PRIMARY KEY' 
+    AND TABLE_NAME = 'PRT_TelefonosTrabajador' 
+    AND TABLE_SCHEMA ='dbo')   
+BEGIN
+ALTER TABLE dbo.PRT_TelefonosTrabajador ADD CONSTRAINT 
+        PK_PRT_TelefonosTrabajador_chrCUILintIdTelefono PRIMARY KEY CLUSTERED 
+        ( 
+			chrCUIL,
+			intIdTelefono
+         
+        ) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+END
+GO

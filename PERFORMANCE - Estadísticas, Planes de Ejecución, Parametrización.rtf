@@ -1,0 +1,310 @@
+{\rtf1\ansi\ansicpg1252\deff0\deflang11274{\fonttbl{\f0\froman\fcharset0 Times New Roman;}{\f1\fswiss\fcharset0 Courier New;}{\f2\fnil\fcharset0 Calibri;}{\f3\fnil\fcharset2 Symbol;}}
+{\colortbl ;\red0\green0\blue255;}
+{\*\generator Msftedit 5.41.21.2510;}\viewkind4\uc1\pard\sb100\sa100\f0\fs24 Using Statistics to Improve Query Performance\par
+The query optimizer uses statistics to create query plans that improve query performance. For most queries, the query optimizer already generates the necessary statistics for a high quality query plan; in a few cases, you need to create additional statistics or modify the query design for best results.\par
+This topic discusses the following concepts and guidelines for using query optimization statistics effectively:\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100{\field{\*\fldinst{HYPERLINK "\\l "DefinitionQOStatistics""}}{\fldrslt{\cf1\ul What are Query Optimization Statistics?}}}\cf0\ulnone\f0\fs24\par
+{\field{\*\fldinst{HYPERLINK "{\pntext\f3\'B7\tab}\\l "StatisticsOptions""}}{\fldrslt{\cf1\ul Using the Database-Wide Statistics Options}}}\cf0\ulnone\f0\fs24\par
+{\field{\*\fldinst{HYPERLINK "{\pntext\f3\'B7\tab}\\l "CreateStatistics""}}{\fldrslt{\cf1\ul Determining When to Create Statistics}}}\cf0\ulnone\f0\fs24\par
+{\field{\*\fldinst{HYPERLINK "{\pntext\f3\'B7\tab}\\l "UpdateStatistics""}}{\fldrslt{\cf1\ul Determining When to Update Statistics}}}\cf0\ulnone\f0\fs24\par
+{\field{\*\fldinst{HYPERLINK "{\pntext\f3\'B7\tab}\\l "DesignStatistics""}}{\fldrslt{\cf1\ul Designing Queries that Use Statistics Effectively}}}\cf0\ulnone\f0\fs24\par
+\pard\sb100\sa100 For more information about the query plan and how it relates to query performance, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms191227(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Analyzing a Query}}}\cf0\ulnone\f0\fs24 .\par
+\pard\keepn\sb100\sa100\b\fs36{\field{\*\fldinst{HYPERLINK "javascript:void(0)"}}{\fldrslt{\cf1\ul What Are Query Optimization Statistics?}}}\cf0\ulnone\f0\fs36  \par
+{\field{\*\fldinst{HYPERLINK "/en-us/library/ms190397(v=sql.105).aspx" \\\\l "Anchor_0"}}{\fldrslt{}}}\f0\fs36\par
+\pard\sb100\sa100\b0\fs24\par
+Statistics for query optimization are objects that contain statistical information about the distribution of values in one or more columns of a table or indexed view. The query optimizer uses these statistics to estimate the cardinality, or number of rows, in the query result. These cardinality estimates enable the query optimizer to create a high-quality query plan. For example, the query optimizer could use cardinality estimates to choose the index seek operator instead of the more resource-intensive index scan operator, and in doing so improve query performance.\par
+Each statistics object is created on a list of one or more table columns and includes a histogram displaying the distribution of values in the first column. Statistics objects on multiple columns also store statistical information about the correlation of values among the columns. These correlation statistics, or densities, are derived from the number of distinct rows of column values. For more information about statistics objects, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms174384(v=sql.105).aspx"}}{\fldrslt{\cf1\ul DBCC SHOW_STATISTICS (Transact-SQL)}}}\cf0\ulnone\f0\fs24 .\par
+\pard\keepn\sb100\sa100\b\fs28 Filtered Statistics\par
+\pard\sb100\sa100\b0\fs24 Filtered statistics can improve query performance for queries that select from well-defined subsets of data. Filtered statistics use a filter predicate to select the subset of data that is included in the statistics. Well-designed filtered statistics can improve the query execution plan compared with full-table statistics. For more information about the filter predicate, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms188038(v=sql.105).aspx"}}{\fldrslt{\cf1\ul CREATE STATISTICS (Transact-SQL)}}}\cf0\ulnone\f0\fs24 . For more information about when to create filtered statistics, see the {\field{\*\fldinst{HYPERLINK "\\l "UpdateStatistics""}}{\fldrslt{\cf1\ul Determining When to Create Statistics}}}\cf0\ulnone\f0\fs24  section in this topic. For a case study, see the blog entry, {\field{\*\fldinst{HYPERLINK "http://go.microsoft.com/fwlink/?LinkId=178505"}}{\fldrslt{\cf1\ul Using Filtered Statistics with Partitioned Tables}}}\cf0\ulnone\f0\fs24 , on the SQLCAT Web site.\par
+\pard\keepn\sb100\sa100\b\fs36{\field{\*\fldinst{HYPERLINK "javascript:void(0)"}}{\fldrslt{\cf1\ul Using the Database-Wide Statistics Options}}}\cf0\ulnone\f0\fs36  \par
+{\field{\*\fldinst{HYPERLINK "/en-us/library/ms190397(v=sql.105).aspx" \\\\l "Anchor_1"}}{\fldrslt{}}}\f0\fs36\par
+\pard\sb100\sa100\b0\fs24\par
+It is important to understand what the following database-wide statistics options do and to verify they are set appropriately:\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 AUTO_CREATE_STATISTICS\par
+{\pntext\f3\'B7\tab}AUTO_UPDATE_STATISTICS\par
+{\pntext\f3\'B7\tab}AUTO_UPDATE_STATISTICS_ASYNC \par
+\pard\keepn\sb100\sa100\b\fs28 Using the AUTO_CREATE_STATISTICS Option\par
+\pard\sb100\sa100\b0\fs24 When the automatic create statistics option, AUTO_CREATE_STATISTICS, is on, the query optimizer creates statistics on individual columns in the query predicate, as necessary, to improve cardinality estimates for the query plan. These single-column statistics are created on columns that do not already have a histogram in an existing statistics object.\par
+You can use the following query to determine if the query optimizer has created statistics for a query predicate column. It queries the catalog views sys.stats and sys.stats_columns to return the database object name, the column name, and the statistics name for all of the columns that have single-column statistics. When the query optimizer creates statistics on single columns as a result of using the AUTO_CREATE_STATISTICS option, the statistics name starts with _WA.\par
+{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_c9eace61-7ec2-47a5-bd5b-e3949f45e744');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 USE AdventureWorks;\par
+GO\par
+SELECT OBJECT_NAME(s.object_id) AS object_name,\par
+    COL_NAME(sc.object_id, sc.column_id) AS column_name,\par
+    s.name AS statistics_name\par
+FROM sys.stats AS s Join sys.stats_columns AS sc\par
+    ON s.stats_id = sc.stats_id AND s.object_id = sc.object_id\par
+WHERE s.name like '_WA%'\par
+ORDER BY s.name;\par
+\pard\sb100\sa100\f0\fs24 The AUTO_CREATE_STATISTICS option does not determine whether statistics get created for indexes. This option also does not generate filtered statistics. It applies strictly to single-column statistics for the full table.\par
+\pard\keepn\sb100\sa100\b\fs28 Using the AUTO_UPDATE_STATISTICS Option\par
+\pard\sb100\sa100\b0\fs24 When the automatic update statistics option, AUTO_UPDATE_STATISTICS, is on, the query optimizer determines when statistics might be out-of-date and then updates them when they are used by a query. Statistics become out-of-date after insert, update, delete, or merge operations change the data distribution in the table or indexed view. The query optimizer determines when statistics might be out-of-date by counting the number of data modifications since the last statistics update and comparing the number of modifications to a threshold. The threshold is based on the number of rows in the table or indexed view. \par
+The query optimizer checks for out-of-date statistics before compiling a query and before executing a cached query plan. Before compiling a query, the query optimizer uses the columns, tables, and indexed views in the query predicate to determine which statistics might be out-of-date. Before executing a cached query plan, the Database Engine verifies that the query plan references up-to-date statistics. \par
+The AUTO_UPDATE_STATISTICS option applies to statistics objects created for indexes, single-columns in query predicates, and statistics created with the {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms188038(v=sql.105).aspx"}}{\fldrslt{\cf1\ul CREATE STATISTICS}}}\cf0\ulnone\f0\fs24  statement. This option also applies to filtered statistics.\par
+\pard\keepn\sb100\sa100\b\fs28 Setting AUTO_CREATE_STATISTICS and AUTO_UPDATE_STATISTICS Options To On\par
+\pard\sb100\sa100\b0\fs24 The automatic create statistics option, AUTO_CREATE_STATISTICS, and the automatic update statistics option, AUTO_UPDATE_STATISTICS, are on by default and we recommend using the default for most user databases. You can use the following SELECT statement to view the current values of these options for all user databases: \par
+{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_a0cadb92-7699-4dc8-b5fc-50907fe957ea');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 SELECT name AS "Name", \par
+    is_auto_create_stats_on AS "Auto Create Stats",\par
+    is_auto_update_stats_on AS "Auto Update Stats",\par
+    is_read_only AS "Read Only" \par
+FROM sys.databases\par
+WHERE database_ID > 4;\par
+GO\par
+\pard\sb100\sa100\f0\fs24 The following example sets AUTO_CREATE_STATISTICS and AUTO_UPDATE_STATISTICS to ON for the AdventureWorks2008R2 database:\par
+{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_a144e88a-6305-4fbb-9ed7-934b7fd8462f');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 USE AdventureWorks2008R2;\par
+GO\par
+ALTER DATABASE AdventureWorks2008R2\par
+    SET AUTO_CREATE_STATISTICS ON;\par
+ALTER DATABASE AdventureWorks2008R2\par
+    SET AUTO_UPDATE_STATISTICS ON;\par
+GO\par
+\pard\sb100\sa100\f0\fs24 For more information about how to set these statistics options, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/bb522682(v=sql.105).aspx"}}{\fldrslt{\cf1\ul ALTER DATABASE SET Options (Transact-SQL)}}}\cf0\ulnone\f0\fs24 . \par
+\par
+Parameters and Execution Plan Reuse\par
+The use of parameters, including parameter markers in ADO, OLE DB, and ODBC applications, can increase the reuse of execution plans.\par
+\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\qc\lang10\f2\fs22{\pict\wmetafile8\picw7620\pich2540\picwgoal4320\pichgoal1440 
+0100090000035900000003001c00000000000400000003010600050000000c02ec09c41d070000
+00fc020000000000000000040000002d01000008000000fa020000000000000000000004000000
+2d0101001c000000fb020c00090000000000900100000000000202024d532053616e7320536572
+6966000a0023008a0100000000ffffffffe8bddf0f040000002d0102000d00000021050d005365
+637572697479206e6f746500b2fd0406030000000000
+}\lang11274\b\f0\fs24 Security Note\cell\row\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\b0 Using parameters or parameter markers to hold values that are typed by end users is more secure than concatenating the values into a string that is then executed by using either a data access API method, the EXECUTE statement, or the \b sp_executesql\b0  stored procedure.\cell\row\pard\sb100\sa100 The only difference between the following two SELECT statements is the values that are compared in the WHERE clause:\par
+{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_959f6efe-05da-4b4a-ab35-1d58267336c5');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 SELECT * \par
+FROM AdventureWorks2008R2.Production.Product \par
+WHERE ProductSubcategoryID = 1;\par
+\par
+SELECT * \par
+FROM AdventureWorks2008R2.Production.Product \par
+WHERE ProductSubcategoryID = 4;\par
+\pard\sb100\sa100\f0\fs24 The only difference between the execution plans for these queries is the value stored for the comparison against the \b ProductSubcategoryID\b0  column. While the goal is for SQL Server to always recognize that the statements generate essentially the same plan and reuse the plans, SQL Server sometimes does not detect this in complex SQL statements.\par
+Separating constants from the SQL statement by using parameters helps the relational engine recognize duplicate plans. You can use parameters in the following ways: \par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 In Transact-SQL, use \b sp_executesql\b0 : \par
+\pard\li720\sb100\sa100{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_0a03acb7-37e7-4628-bf35-0d7757f6145e');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\li720\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 DECLARE @MyIntParm INT\par
+SET @MyIntParm = 1\par
+EXEC sp_executesql\par
+  N'SELECT * \par
+  FROM AdventureWorks2008R2.Production.Product \par
+  WHERE ProductSubcategoryID = @Parm',\par
+  N'@Parm INT',\par
+  @MyIntParm\par
+\pard\li720\sb100\sa100\f0\fs24 This method is recommended for Transact-SQL scripts, stored procedures, or triggers that generate SQL statements dynamically. \par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 ADO, OLE DB, and ODBC use parameter markers. Parameter markers are question marks (?) that replace a constant in an SQL statement and are bound to a program variable. For example, you would do the following in an ODBC application: \par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li1440\sb100\sa100 Use \b SQLBindParameter\b0  to bind an integer variable to the first parameter marker in an SQL statement.\par
+{\pntext\f3\'B7\tab}Put the integer value in the variable.\par
+{\pntext\f3\'B7\tab}Execute the statement, specifying the parameter marker (?): \par
+\pard\li1440\sb100\sa100{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_219aa2c3-f1c1-4628-8f28-dafb72166d9a');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\li1440\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 SQLExecDirect(hstmt, \par
+  "SELECT * \par
+  FROM AdventureWorks2008R2.Production.Product \par
+  WHERE ProductSubcategoryID = ?",\par
+  SQL_NTS);\par
+\pard\li1440\sb100\sa100\f0\fs24 The SQL Server Native Client OLE DB Provider and the SQL Server Native Client ODBC driver included with SQL Server use \b sp_executesql\b0  to send statements to SQL Server when parameter markers are used in applications. \par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 To design stored procedures, which use parameters by design.\par
+\pard\sb100\sa100 If you do not explicitly build parameters into the design of your applications, you can also rely on the SQL Server query optimizer to automatically parameterize certain queries by using the default behavior of {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms186219(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Simple Parameterization}}}\cf0\ulnone\f0\fs24 . Alternatively, you can force the query optimizer to consider parameterizing all queries in the database by setting the PARAMETERIZATION option of the ALTER DATABASE statement to FORCED. For more information, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms175037(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Forced Parameterization}}}\cf0\ulnone\f0\fs24 .\par
+When Forced Parameterization is enabled, Simple Parameterization can still occur. For example, the following query cannot be parameterized according to the rules of forced parameterization:\par
+{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_49f31c0e-6a50-4824-a422-66517f2dded3');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 SELECT * FROM Person.Address\par
+WHERE AddressID = 1 + 2;\par
+\pard\sb100\sa100\f0\fs24 However, it can be parameterized according to simple parameterization rules. When forced parameterization is tried but fails, simple parameterization is still subsequently tried.\par
+\par
+\par
+\par
+Troubleshooting Poor Query Performance: Cardinality Estimation\par
+\pard\sa200\sl276\slmult1\lang10\f2\fs22\par
+\pard\sb100\sa100\lang11274\f0\fs24 The query optimizer in SQL Server is cost-based. This means that it selects query plans that have the lowest estimated processing cost to execute. The query optimizer determines the cost of executing a query plan based on two main factors: \par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 The total number of rows processed at each level of a query plan, referred to as the cardinality of the plan.\par
+{\pntext\f3\'B7\tab}The cost model of the algorithm dictated by the operators used in the query.\par
+\pard\sb100\sa100 The first factor, cardinality, is used as an input parameter of the second factor, the cost model. Therefore, improved cardinality leads to better estimated costs and, in turn, faster execution plans.\par
+SQL Server estimates cardinalities primarily from histograms that are created when indexes or statistics are created, either manually or automatically. Sometimes, SQL Server also uses constraint information and logical rewrites of queries to determine cardinality.\par
+In the following cases, SQL Server cannot accurately calculate cardinalities. This causes inaccurate cost calculations that may cause suboptimal query plans. Avoiding these constructs in queries may improve query performance. Sometimes, alternative query formulations or other measures are possible and these are pointed out. \par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 Queries with predicates that use comparison operators between different columns of the same table.\par
+{\pntext\f3\'B7\tab}Queries with predicates that use operators, and any one of the following are true: \par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li1440\sb100\sa100 There are no statistics on the columns involved on either side of the operators.\par
+{\pntext\f3\'B7\tab}The distribution of values in the statistics is not uniform, but the query seeks a highly selective value set. This situation can be especially true if the operator is anything other than the equality (=) operator.\par
+{\pntext\f3\'B7\tab}The predicate uses the not equal to (!=) comparison operator or the NOT logical operator.\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 Queries that use any of the SQL Server built-in functions or a scalar-valued, user-defined function whose argument is not a constant value.\par
+{\pntext\f3\'B7\tab}Queries that involve joining columns through arithmetic or string concatenation operators.\par
+{\pntext\f3\'B7\tab}Queries that compare variables whose values are not known when the query is compiled and optimized.\par
+\pard\sb100\sa100 The following measures can be used to try to improve performance on these types of queries: \par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 Build useful indexes or statistics on the columns that are involved in the query. For more information, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms190804(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Designing Indexes}}}\cf0\ulnone\f0\fs24  and {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms190397(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Using Statistics to Improve Query Performance}}}\cf0\ulnone\f0\fs24 . \par
+{\pntext\f3\'B7\tab}Consider using computed columns and rewriting the query if the query uses comparison or arithmetic operators to compare or combine two or more columns. For example, the following query compares the values in two columns: \par
+\pard\li720\sb100\sa100{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_33839346-a8c9-41e6-b297-38626f99edea');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\li720\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 SELECT * FROM MyTable\par
+WHERE MyTable.Col1 > MyTable.Col2\par
+\pard\li720\sb100\sa100\f0\fs24 Performance may be improved if you add a computed column \b Col3\b0  to \b MyTable\b0  that calculates the difference between \b Col1\b0  and \b Col2\b0  (\b Col1\b0  minus \b Col2\b0 ). Then, rewrite the query: \par
+{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_6dd9de84-5980-4331-a3ff-6ad9e02bb50f');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\li720\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 SELECT * FROM MyTable\par
+WHERE Col3 > 0\par
+\pard\li720\sb100\sa100\f0\fs24 Performance will probably improve more if you build an index on \b MyTable.Col3\b0 . \par
+\pard\sa200\sl276\slmult1\lang10\f2\fs22\par
+\par
+\pard\sb100\sa100\lang11274\f0\fs24 Troubleshooting Poor Query Performance: Constant Folding and Expression Evaluation During Cardinality Estimation\par
+\pard\sa200\sl276\slmult1\lang10\f2\fs22\par
+\pard\sb100\sa100\lang11274\f0\fs24 SQL Server evaluates some constant expressions early to improve query performance. This is referred to as constant folding. A constant is a Transact-SQL literal, such as 3, 'ABC', '2005-12-31', 1.0e3, or 0x12345678.\par
+\pard\keepn\sb100\sa100\b\fs36{\field{\*\fldinst{HYPERLINK "javascript:void(0)"}}{\fldrslt{\cf1\ul Foldable Expressions}}}\cf0\ulnone\f0\fs36  \par
+{\field{\*\fldinst{HYPERLINK "/en-us/library/ms175933(v=sql.105).aspx" \\\\l "Anchor_0"}}{\fldrslt{}}}\f0\fs36\par
+\pard\sb100\sa100\b0\fs24\par
+SQL Server uses constant folding with the following types of expressions:\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 Arithmetic expressions, such as 1+1, 5/3*2, that contain only constants.\par
+{\pntext\f3\'B7\tab}Logical expressions, such as 1=1 and 1>2 AND 3>4, that contain only constants.\par
+{\pntext\f3\'B7\tab}Built-in functions that are considered foldable by SQL Server, including CAST and CONVERT. Generally, an intrinsic function is foldable if it is a function of its inputs only and not other contextual information, such as SET options, language settings, database options, and encryption keys. Nondeterministic functions are not foldable. Deterministic built-in functions are foldable, with some exceptions.\par
+\pard\sb100\sa100 An exception is made for large object types. If the output type of the folding process is a large object type (text, image, nvarchar(max), varchar(max), or varbinary(max)), then SQL Server does not fold the expression.\par
+\pard\keepn\sb100\sa100\b\fs36{\field{\*\fldinst{HYPERLINK "javascript:void(0)"}}{\fldrslt{\cf1\ul Nonfoldable Expressions}}}\cf0\ulnone\f0\fs36  \par
+{\field{\*\fldinst{HYPERLINK "/en-us/library/ms175933(v=sql.105).aspx" \\\\l "Anchor_1"}}{\fldrslt{}}}\f0\fs36\par
+\pard\sb100\sa100\b0\fs24\par
+All other expression types are not foldable. In particular, the following types of expressions are not foldable:\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 Nonconstant expressions such as an expression whose result depends on the value of a column.\par
+{\pntext\f3\'B7\tab}Expressions whose results depend on a local variable or parameter, such as @x.\par
+{\pntext\f3\'B7\tab}Nondeterministic functions.\par
+{\pntext\f3\'B7\tab}User-defined functions (both Transact-SQL and CLR).\par
+{\pntext\f3\'B7\tab}Expressions whose results depend on language settings.\par
+{\pntext\f3\'B7\tab}Expressions whose results depend on SET options.\par
+{\pntext\f3\'B7\tab}Expressions whose results depend on server configuration options.\par
+\pard\keepn\sb100\sa100\b\fs28 Examples of Foldable and Nonfoldable Constant Expressions\par
+\pard\sb100\sa100\b0\fs24 Consider the following query:\par
+{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_e9d8d0a2-a738-4c0b-8fae-05bb6bee471d');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 SELECT *\par
+FROM Sales.SalesOrderHeader s JOIN sales.SalesOrderDetail d \par
+ON s.SalesOrderID = d.SalesOrderID\par
+WHERE TotalDue > 117.00 + 1000.00\par
+\pard\sb100\sa100\f0\fs24 If the PARAMETERIZATION database option is not set to FORCED for this query (the default is SIMPLE), then the expression 117.00 + 1000.00 is evaluated and replaced by its result, 1117.00, before the query is compiled. Benefits of this constant folding include the following:\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 The expression does not have to be evaluated repeatedly at run time.\par
+{\pntext\f3\'B7\tab}The value of the expression after it is evaluated is used by the query optimizer to estimate the size of the result set of the portion of the query TotalDue > 117.00 + 1000.00.\par
+\pard\sb100\sa100 On the other hand, if dbo.f is a scalar user-defined function, the expression dbo.f(100) is not folded, because SQL Server does not fold expressions that involve user-defined functions, even if they are deterministic.\par
+\pard\sa200\sl276\slmult1\lang10\f2\fs22\par
+\pard\keepn\sb100\sa100\lang11274\kerning36\b\f0\fs48 Simple Parameterization\par
+\pard\sb100\sa100\kerning0\fs24 SQL Server 2008 R2 \b0\par
+{\field{\*\fldinst{HYPERLINK "javascript:;"}}{\fldrslt{\cf1\ul Other Versions }}}\cf0\ulnone\f0\fs24\par
+\lang10\f2\fs22{\pict\wmetafile8\picw7620\pich2540\picwgoal4320\pichgoal1440 
+0100090000034c00000003001c00000000000400000003010600050000000c02ec09c41d070000
+00fc020000000000000000040000002d01000008000000fa020000000000000000000004000000
+2d0101001c000000fb020c00090000000000900100000000000202024d532053616e7320536572
+6966000a0023008a0100000000ffffffffe8bddf0f040000002d010200030000000000
+}\lang11274\f0\fs24\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100{\field{\*\fldinst{HYPERLINK "/en-us/library/ms186219(v=sql.100).aspx"}}{\fldrslt{}}}\f0\fs24\par
+{\field{\*\fldinst{HYPERLINK "{\pntext\f3\'B7\tab}/en-us/library/ms186219(v=sql.90).aspx"}}{\fldrslt{}}}\f0\fs24\par
+{\field{\*\fldinst{HYPERLINK "{\pntext\f3\'B7\tab}\\l """}}{\fldrslt{}}}\f0\fs24\par
+\pard\sb100\sa100 4 out of 11 rated this helpful - {\field{\*\fldinst{HYPERLINK "\\l "feedback""}}{\fldrslt{\cf1\ul Rate this topic}}}\cf0\ulnone\f0\fs24  \par
+In SQL Server, using parameters or parameter markers in Transact-SQL statements increases the ability of the relational engine to match new SQL statements with existing, previously-compiled execution plans.\par
+\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\qc\lang10\f2\fs22{\pict\wmetafile8\picw7620\pich2540\picwgoal4320\pichgoal1440 
+0100090000035900000003001c00000000000400000003010600050000000c02ec09c41d070000
+00fc020000000000000000040000002d01000008000000fa020000000000000000000004000000
+2d0101001c000000fb020c00090000000000900100000000000202024d532053616e7320536572
+6966000a0023008a0100000000ffffffffe8bddf0f040000002d0102000d00000021050d005365
+637572697479206e6f746500b2fd0406030000000000
+}\lang11274\b\f0\fs24 Security Note\cell\row\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\b0 Using parameters or parameter markers to hold values typed by end users is more secure than concatenating the values into a string that is then executed using either a data access API method, the EXECUTE statement, or the \b sp_executesql\b0  stored procedure.\cell\row\pard\sb100\sa100 If a SQL statement is executed without parameters, SQL Server parameterizes the statement internally to increase the possibility of matching it against an existing execution plan. This process is called simple parameterization. In SQL Server 2000, the process was referred to as auto-parameterization.\par
+Consider this statement:\par
+{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_e04c5e86-ccb7-4fe6-8192-af8813a99a0d');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 SELECT * FROM AdventureWorks2008R2.Production.Product \par
+WHERE ProductSubcategoryID = 1;\par
+\pard\sb100\sa100\f0\fs24 The value 1 at the end of the statement can be specified as a parameter. The relational engine builds the execution plan for this batch as if a parameter had been specified in place of the value 1. Because of this simple parameterization, SQL Server recognizes that the following two statements generate essentially the same execution plan and reuses the first plan for the second statement:\par
+{\field{\*\fldinst{HYPERLINK "javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_a3c7cee7-bea5-4584-8ea7-b8ce805c2fc7');"}}{\fldrslt{\cf1\ul Copy}}}\cf0\ulnone\f0\fs24  \par
+\pard\tx0\tx959\tx1918\tx2877\tx3836\tx4795\tx5754\tx6713\tx7672\tx8631\f1\fs20 SELECT * FROM AdventureWorks2008R2.Production.Product \par
+WHERE ProductSubcategoryID = 1;\par
+\par
+SELECT * FROM AdventureWorks2008R2.Production.Product \par
+WHERE ProductSubcategoryID = 4;\par
+\pard\sb100\sa100\f0\fs24 When processing complex SQL statements, the relational engine may have difficulty determining which expressions can be parameterized. To increase the ability of the relational engine to match complex SQL statements to existing, unused execution plans, explicitly specify the parameters using either \b sp_executesql\b0  or parameter markers. For more information, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms175580(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Parameters and Execution Plan Reuse}}}\cf0\ulnone\f0\fs24 . \par
+\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\qc\lang10\f2\fs22{\pict\wmetafile8\picw7620\pich2540\picwgoal4320\pichgoal1440 
+0100090000035400000003001c00000000000400000003010600050000000c02ec09c41d070000
+00fc020000000000000000040000002d01000008000000fa020000000000000000000004000000
+2d0101001c000000fb020c00090000000000900100000000000202024d532053616e7320536572
+6966000a0023008a0100000000ffffffffe8bddf0f040000002d01020008000000210504004e6f
+7465b2fd8a07030000000000
+}\lang11274\b\f0\fs24 Note\cell\row\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\b0 When the +, -, *, /, or % arithmetic operators are used to perform implicit or explicit conversion of int, smallint, tinyint, or bigint constant values to the float, real, decimal or numeric data types, SQL Server applies specific rules to calculate the type and precision of the expression results. However, these rules differ, depending on whether the query is parameterized or not. Therefore, similar expressions in queries can, in some cases, produce differing results. For more information, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms187745(v=sql.105).aspx"}}{\fldrslt{\cf1\ul int, bigint, smallint, and tinyint (Transact-SQL)}}}\cf0\ulnone\f0\fs24 .\cell\row\pard\sb100\sa100 Under the default behavior of simple parameterization, SQL Server parameterizes a relatively small class of queries. However, you can specify that all queries in a database be parameterized, subject to certain limitations, by setting the PARAMETERIZATION option of the ALTER DATABASE command to FORCED. Doing so may improve the performance of databases that experience high volumes of concurrent queries by reducing the frequency of query compilations. For more information, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms175037(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Forced Parameterization}}}\cf0\ulnone\f0\fs24 .\par
+Alternatively, you can specify that a single query, and any others that are syntactically equivalent but differ only in their parameter values, be parameterized. For more information, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms191275(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Specifying Query Parameterization Behavior by Using Plan Guides}}}\cf0\ulnone\f0\fs24 . \par
+\pard\sa200\sl276\slmult1\lang10\f2\fs22\par
+\pard\keepn\sb100\sa100\lang11274\kerning36\b\f0\fs48 Forced Parameterization\par
+\pard\sb100\sa100\kerning0\fs24 SQL Server 2008 R2 \b0\par
+{\field{\*\fldinst{HYPERLINK "javascript:;"}}{\fldrslt{\cf1\ul Other Versions }}}\cf0\ulnone\f0\fs24\par
+\lang10\f2\fs22{\pict\wmetafile8\picw7620\pich2540\picwgoal4320\pichgoal1440 
+0100090000034c00000003001c00000000000400000003010600050000000c02ec09c41d070000
+00fc020000000000000000040000002d01000008000000fa020000000000000000000004000000
+2d0101001c000000fb020c00090000000000900100000000000202024d532053616e7320536572
+6966000a0023008a0100000000ffffffffe8bddf0f040000002d010200030000000000
+}\lang11274\f0\fs24\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100{\field{\*\fldinst{HYPERLINK "/en-us/library/ms175037(v=sql.100).aspx"}}{\fldrslt{}}}\f0\fs24\par
+{\field{\*\fldinst{HYPERLINK "{\pntext\f3\'B7\tab}/en-us/library/ms175037(v=sql.90).aspx"}}{\fldrslt{}}}\f0\fs24\par
+{\field{\*\fldinst{HYPERLINK "{\pntext\f3\'B7\tab}\\l """}}{\fldrslt{}}}\f0\fs24\par
+\pard\sb100\sa100 9 out of 15 rated this helpful - {\field{\*\fldinst{HYPERLINK "\\l "feedback""}}{\fldrslt{\cf1\ul Rate this topic}}}\cf0\ulnone\f0\fs24  \par
+You can override the default {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms186219(v=sql.105).aspx"}}{\fldrslt{\cf1\ul simple parameterization}}}\cf0\ulnone\f0\fs24  behavior of SQL Server by specifying that all SELECT, INSERT, UPDATE, and DELETE statements in a database be parameterized, subject to certain limitations. Forced parameterization is enabled by setting the PARAMETERIZATION option to FORCED in the {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms174269(v=sql.105).aspx"}}{\fldrslt{\cf1\ul ALTER DATABASE}}}\cf0\ulnone\f0\fs24  statement. Forced parameterization may improve the performance of certain databases by reducing the frequency of query compilations and recompilations. Databases that may benefit from forced parameterization are generally those that experience high volumes of concurrent queries from sources such as point-of-sale applications.\par
+When the PARAMETERIZATION option is set to FORCED, any literal value that appears in a SELECT, INSERT, UPDATE or DELETE statement, submitted in any form, is converted to a parameter during query compilation. The exceptions are literals that appear in the following query constructs: \par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 INSERT...EXECUTE statements.\par
+{\pntext\f3\'B7\tab}Statements inside the bodies of stored procedures, triggers, or user-defined functions. SQL Server already reuses query plans for these routines.\par
+{\pntext\f3\'B7\tab}Prepared statements that have already been parameterized on the client-side application.\par
+{\pntext\f3\'B7\tab}Statements that contain XQuery method calls, where the method appears in a context where its arguments would typically be parameterized, such as a WHERE clause. If the method appears in a context where its arguments would not be parameterized, the rest of the statement is parameterized.\par
+{\pntext\f3\'B7\tab}Statements inside a Transact-SQL cursor. (SELECT statements inside API cursors are parameterized.)\par
+{\pntext\f3\'B7\tab}Deprecated query constructs.\par
+{\pntext\f3\'B7\tab}Any statement that is run in the context of ANSI_PADDING or ANSI_NULLS set to OFF.\par
+{\pntext\f3\'B7\tab}Statements that contain more than 2,097 literals that are eligible for parameterization.\par
+{\pntext\f3\'B7\tab}Statements that reference variables, such as WHERE T.col2 >= @bb.\par
+{\pntext\f3\'B7\tab}Statements that contain the RECOMPILE query hint.\par
+{\pntext\f3\'B7\tab}Statements that contain a COMPUTE clause.\par
+{\pntext\f3\'B7\tab}Statements that contain a WHERE CURRENT OF clause.\par
+\pard\sb100\sa100 Additionally, the following query clauses are not parameterized. Note that in these cases, only the clauses are not parameterized. Other clauses within the same query may be eligible for forced parameterization.\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 The <select_list> of any SELECT statement. This includes SELECT lists of subqueries and SELECT lists inside INSERT statements.\par
+{\pntext\f3\'B7\tab}Subquery SELECT statements that appear inside an IF statement.\par
+{\pntext\f3\'B7\tab}The TOP, TABLESAMPLE, HAVING, GROUP BY, ORDER BY, OUTPUT...INTO, or FOR XML clauses of a query.\par
+{\pntext\f3\'B7\tab}Arguments, either direct or as subexpressions, to OPENROWSET, OPENQUERY, OPENDATASOURCE, OPENXML, or any FULLTEXT operator.\par
+{\pntext\f3\'B7\tab}The pattern and escape_character arguments of a LIKE clause.\par
+{\pntext\f3\'B7\tab}The style argument of a CONVERT clause.\par
+{\pntext\f3\'B7\tab}Integer constants inside an IDENTITY clause.\par
+{\pntext\f3\'B7\tab}Constants specified by using ODBC extension syntax.\par
+{\pntext\f3\'B7\tab}Constant-foldable expressions that are arguments of the +, -, *, /, and % operators. When considering eligibility for forced parameterization, SQL Server considers an expression to be constant-foldable when either of the following conditions is true:\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li1440\sb100\sa100 No columns, variables, or subqueries appear in the expression.\par
+{\pntext\f3\'B7\tab}The expression contains a CASE clause.\par
+\pard\li720\sb100\sa100 For more information about constant-foldable expressions, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms175933(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Troubleshooting Poor Query Performance: Constant Folding and Expression Evaluation During Cardinality Estimation}}}\cf0\ulnone\f0\fs24 .\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 Arguments to query hint clauses. These include the number_of_rows argument of the FAST query hint, the number_of_processors argument of the MAXDOP query hint, and the number argument of the MAXRECURSION query hint.\par
+\pard\sb100\sa100 Parameterization occurs at the level of individual Transact-SQL statements. In other words, individual statements in a batch are parameterized. After compiling, a parameterized query is executed in the context of the batch in which it was originally submitted. If an execution plan for a query is cached, you can determine whether the query was parameterized by referencing the \b sql\b0  column of the {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms187815(v=sql.105).aspx"}}{\fldrslt{\cf1\ul sys.syscacheobjects}}}\cf0\ulnone\f0\fs24  dynamic management view. If a query is parameterized, the names and data types of parameters come before the text of the submitted batch in this column, such as (\b @1 tinyint\b0 ). For information about query plan caching, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms181055(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Execution Plan Caching and Reuse}}}\cf0\ulnone\f0\fs24 .\par
+\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\qc\lang10\f2\fs22{\pict\wmetafile8\picw7620\pich2540\picwgoal4320\pichgoal1440 
+0100090000035400000003001c00000000000400000003010600050000000c02ec09c41d070000
+00fc020000000000000000040000002d01000008000000fa020000000000000000000004000000
+2d0101001c000000fb020c00090000000000900100000000000202024d532053616e7320536572
+6966000a0023008a0100000000ffffffffe8bddf0f040000002d01020008000000210504004e6f
+7465b2fd8a07030000000000
+}\lang11274\b\f0\fs24 Note\cell\row\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\b0 Parameter names are arbitrary. Users or applications should not rely on a particular naming order. Also, the following can change between versions of SQL Server and service pack upgrades: Parameter names, the choice of literals that are parameterized, and the spacing in the parameterized text.\cell\row\pard\keepn\sb100\sa100\b\fs36{\field{\*\fldinst{HYPERLINK "javascript:void(0)"}}{\fldrslt{\cf1\ul Data Types of Parameters}}}\cf0\ulnone\f0\fs36  \par
+{\field{\*\fldinst{HYPERLINK "/en-us/library/ms175037(v=sql.105).aspx" \\\\l "Anchor_0"}}{\fldrslt{}}}\f0\fs36\par
+\pard\sb100\sa100\b0\fs24\par
+When SQL Server parameterizes literals, the parameters are converted to the following data types:\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 Integer literals whose size would otherwise fit within the int data type parameterize to int. Larger integer literals that are parts of predicates that involve any comparison operator (includes <, <=, =, !=, >, >=, , !<, !>, <>, ALL, ANY, SOME, BETWEEN, and IN) parameterize to numeric(38,0). Larger literals that are not parts of predicates that involve comparison operators parameterize to numeric whose precision is just large enough to support its size and whose scale is 0.\par
+{\pntext\f3\'B7\tab}Fixed-point numeric literals that are parts of predicates that involve comparison operators parameterize to numeric whose precision is 38 and whose scale is just large enough to support its size. Fixed-point numeric literals that are not parts of predicates that involve comparison operators parameterize to numeric whose precision and scale are just large enough to support its size.\par
+{\pntext\f3\'B7\tab}Floating point numeric literals parameterize to float(53).\par
+{\pntext\f3\'B7\tab}Non-Unicode string literals parameterize to varchar(8000) if the literal fits within 8,000 characters, and to varchar(max) if it is larger than 8,000 characters.\par
+{\pntext\f3\'B7\tab}Unicode string literals parameterize to nvarchar(4000) if the literal fits within 4,000 Unicode characters, and to nvarchar(max) if the literal is larger than 4,000 characters.\par
+{\pntext\f3\'B7\tab}Binary literals parameterize to varbinary(8000) if the literal fits within 8,000 bytes. If it is larger than 8,000 bytes, it is converted to varbinary(max).\par
+{\pntext\f3\'B7\tab}Money type literals parameterize to money.\par
+\pard\keepn\sb100\sa100\b\fs36{\field{\*\fldinst{HYPERLINK "javascript:void(0)"}}{\fldrslt{\cf1\ul Guidelines for Using Forced Parameterization}}}\cf0\ulnone\f0\fs36  \par
+{\field{\*\fldinst{HYPERLINK "/en-us/library/ms175037(v=sql.105).aspx" \\\\l "Anchor_1"}}{\fldrslt{}}}\f0\fs36\par
+\pard\sb100\sa100\b0\fs24\par
+Consider the following when you set the PARAMETERIZATION option to FORCED:\par
+\pard{\pntext\f3\'B7\tab}{\*\pn\pnlvlblt\pnf3\pnindent360{\pntxtb\'B7}}\fi-360\li720\sb100\sa100 Forced parameterization, in effect, changes the literal constants in a query to parameters when compiling a query. Therefore, the query optimizer might choose suboptimal plans for queries. In particular, the query optimizer is less likely to match the query to an indexed view or an index on a computed column. It may also choose suboptimal plans for queries posed on partitioned tables and distributed partitioned views. Forced parameterization should not be used for environments that rely heavily on indexed views and indexes on computed columns. Generally, the PARAMETERIZATION FORCED option should only be used by experienced database administrators after determining that doing this does not adversely affect performance.\par
+{\pntext\f3\'B7\tab}Distributed queries that reference more than one database are eligible for forced parameterization as long as the PARAMETERIZATION option is set to FORCED in the database whose context the query is running.\par
+{\pntext\f3\'B7\tab}Setting the PARAMETERIZATION option to FORCED flushes all query plans from the plan cache of a database, except those that currently are compiling, recompiling, or running. Plans for queries that are compiling or running during the setting change are parameterized the next time the query is executed.\par
+{\pntext\f3\'B7\tab}Setting the PARAMETERIZATION option is an online operation that it requires no database-level exclusive locks.\par
+{\pntext\f3\'B7\tab}Forced parameterization is disabled (set to SIMPLE) when the compatibility of a SQL Server database is set to 80, or a database on an earlier instance is attached to an instance of SQL Server 2005 or later. \par
+{\pntext\f3\'B7\tab}The current setting of the PARAMETERIZATION option is preserved when reattaching or restoring a database.\par
+\pard\sb100\sa100 You can override the behavior of forced parameterization by specifying that simple parameterization be attempted on a single query, and any others that are syntactically equivalent but differ only in their parameter values. Conversely, you can specify that forced parameterization be attempted on only a set of syntactically equivalent queries, even if forced parameterization is disabled in the database. Plan guides are used for this purpose. For more information, see {\field{\*\fldinst{HYPERLINK "https://technet.microsoft.com/en-us/library/ms191275(v=sql.105).aspx"}}{\fldrslt{\cf1\ul Specifying Query Parameterization Behavior by Using Plan Guides}}}\cf0\ulnone\f0\fs24 .\par
+\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\qc\lang10\f2\fs22{\pict\wmetafile8\picw7620\pich2540\picwgoal4320\pichgoal1440 
+0100090000035400000003001c00000000000400000003010600050000000c02ec09c41d070000
+00fc020000000000000000040000002d01000008000000fa020000000000000000000004000000
+2d0101001c000000fb020c00090000000000900100000000000202024d532053616e7320536572
+6966000a0023008a0100000000ffffffffe8bddf0f040000002d01020008000000210504004e6f
+7465b2fd8a07030000000000
+}\lang11274\b\f0\fs24 Note\cell\row\trowd\trgaph10\trleft-10\trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clvertalc\cellx9350\pard\intbl\sb100\sa100\b0 When the PARAMETERIZATION option is set to FORCED, the reporting of error messages may differ from that of simple parameterization: multiple error messages may be reported in cases where fewer message would be reported under simple parameterization, and the line numbers in which errors occur may be reported incorrectly.\cell\row\pard\sb100\sa100\par
+\pard\sa200\sl276\slmult1\lang10\f2\fs22\par
+}
+ 
